@@ -1,0 +1,33 @@
+name: Cloudflare Tunnel Status Sync
+
+on:
+  schedule:
+    - cron: "*/15 * * * *" # Runs every 15 minutes
+
+jobs:
+  sync-status:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Cloudflare Tunnel Status Sync
+        env:
+          CF_ACCOUNT_ID: ${{ vars.CF_ACCOUNT_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_TUNNEL_ID: ${{ vars.CF_TUNNEL_ID }}
+          SP_PAGE_ID: ${{ vars.SP_PAGE_ID }}
+          SP_API_TOKEN: ${{ secrets.SP_API_TOKEN }}
+          SP_COMPONENT_ID: ${{ vars.SP_COMPONENT_ID }}
+        run: python cloudflare_status_sync.py
